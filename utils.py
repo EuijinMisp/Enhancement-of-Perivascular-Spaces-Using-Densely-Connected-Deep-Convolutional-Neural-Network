@@ -63,7 +63,7 @@ def img_crop(img,center,size):
     elif dx == 0:
         img = img[z-int(dz/2):z+int(dz/2),y-int(dy/2):y+int(dy/2),x]
     
-    img = img*255.9
+    img = img*254.9
 
     return img
 
@@ -81,15 +81,27 @@ def fspecial_gauss(size, sigma):
     g = np.exp(-((x**2 + y**2)/(2.0*sigma**2)))
     return g/g.sum()
 
+def ssim3d(img1, img2):
+    mu_x = np.mean(img1)
+    mu_y = np.mean(img2)
+    sig_x = np.std(img1)
+    sig_y = np.std(img2)
+    sig_xy = np.mean((img1 - mu_x)*(img2-mu_y))
+    K1 = 0.01
+    K2 = 0.03
+    L = 1 #bitdepth of image
+    C1 = (K1*L)**2
+    C2 = (K2*L)**2
+    C3 = C2/2
+
+    ssim = ((2*mu_x*mu_y+C1)*(2*sig_xy+C2)*(sig_xy+C3))/(((mu_x*mu_x)+(mu_y*mu_y)+C1)*((sig_x*sig_x)+(sig_y*sig_y)+C2)*(sig_x*sig_y+C3))
+
+    return ssim
+
+"""
 def ssim(img1, img2, cs_map=False):
     
-    """Return the Structural Similarity Map corresponding to input images img1 
-    and img2 (images are assumed to be uint8)
-    
-    This function attempts to mimic precisely the functionality of ssim.m a 
-    MATLAB provided by the author's of SSIM
-    https://ece.uwaterloo.ca/~z70wang/research/ssim/ssim_index.m
-    """
+
     img1 = img1.astype(np.float64)
     img2 = img2.astype(np.float64)
     size = 11
@@ -125,7 +137,8 @@ def ssim3d(img1, img2, cs_map=False):
     avg_ssim/=  img1.shape[0]        
     
     return avg_ssim
-    
+"""
+
 def save_3dimg (save_path,file_name,img_file,img):
 
     seg2_file = sitk.GetImageFromArray(img)
